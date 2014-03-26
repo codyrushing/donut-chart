@@ -1,0 +1,100 @@
+<html>
+<head>
+	<title>Donut Charts</title>
+</head>
+<style type="text/css">
+.slice path {cursor: pointer;}
+</style>
+<body>
+
+	<div id="container">
+
+	</div>
+
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.1/d3.min.js"></script>
+    <script type="text/javascript" src="js/donut-chart.js"></script>
+    <script type="text/javascript">
+    var aListPointsChart = new app.donutChart({
+        container: "#container",
+        height: 300,
+        width: 300,
+        id: "a-list-points-chart",
+        label: "Points",
+        type: "points",
+        origin: -130,
+        destination: 130,
+        thickness: 25,
+        padding: 50,
+        animated: true,
+        remainderLabel: "points needed",
+        buildComplete: function() {
+        	var self = this;
+            
+            // add arc labels
+            var labels = this.slices
+        		.append("svg:text")
+				.attr("transform", function(d, i) {
+					d.startAngleFinal = d.startAngle;
+                    d.endAngleFinal = d.endAngle;
+                    d.innerRadius = self.width/2 + 50;
+			        return "translate(" + self.baseArc.centroid(d) + ")";
+			    })
+			    .attr("text-anchor", "middle")
+                .attr("opacity", 0)
+			    .text(function(d){
+					return d.n;
+				});
+
+            // add global label
+            this.dataGroup.append("svg:text")
+                .attr("dy", ".35em")
+                .attr("text-anchor", "middle")
+                .style("font", "bold 36px Arial")
+                .text(this.label);
+
+            // events example
+            this.arcs
+            .on("mouseover", function(d, i){
+                d.outerRadius = self.width/2 + 5;
+                d.innerRadius -= 5; 
+                d3.select(this).attr("d", self.baseArc(d));
+            })
+            .on("mouseout", function(d, i){
+                d.outerRadius = null
+                d.innerRadius += 5; 
+                d3.select(this).attr("d", self.baseArc(d));
+            })
+
+            // tacking something on to transition
+            this.globalTransition(function(){
+                labels.transition()
+                .attrTween("opacity", function(){
+                    var interpolate = d3.interpolate(0, 1);
+                    return function(t) {
+                        return interpolate(t);
+                    };                    
+                })
+            });
+
+        },
+        data: {
+            total: 70000,
+            values: [{
+                n: 40125,
+                color: "#6dab42"
+            }, {
+            	n: 10000,
+            	color: "#ff0000"
+            }, {
+            	n: 5000,
+            	color: "#0000ff"
+            }, {
+            	n: 5000,
+            	color: "#ffff00"
+            }]
+        }
+    });
+
+    </script>
+</body>
+</html>
