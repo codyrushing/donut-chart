@@ -14,6 +14,8 @@
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.1/d3.min.js"></script>
     <script type="text/javascript" src="js/donut-chart.js"></script>
     <script type="text/javascript">
+    var labels;
+
     var aListPointsChart = new app.donutChart({
         container: "#container",
         height: 300,
@@ -27,11 +29,21 @@
         padding: 50,
         animated: true,
         remainderLabel: "points needed",
+        animationComplete: function(){
+            labels.transition().attrTween("opacity", function(){
+                var interpolate = d3.interpolate(0, 1);
+                return function(t) {
+                    return interpolate(t);
+                };                                    
+            });
+        },
         buildComplete: function() {
         	var self = this;
-            
-            // add arc labels
-            var labels = this.slices
+
+            /* 
+            * add arc labels
+            */
+            labels = this.slices
         		.append("svg:text")
 				.attr("transform", function(d, i) {
 					d.startAngleFinal = d.startAngle;
@@ -45,14 +57,18 @@
 					return d.n;
 				});
 
-            // add global label
+            /* 
+            * add global label
+            */
             this.dataGroup.append("svg:text")
                 .attr("dy", ".35em")
                 .attr("text-anchor", "middle")
                 .style("font", "bold 36px Arial")
                 .text(this.label);
 
-            // events example
+            /* 
+            * events example
+            */
             this.arcs
             .on("mouseover", function(d, i){
                 d.outerRadius = self.width/2 + 5;
@@ -63,17 +79,26 @@
                 d.outerRadius = null
                 d.innerRadius += 5; 
                 d3.select(this).attr("d", self.baseArc(d));
-            })
+            });
 
-            // tacking something on to transition
+            /*
+            * tacking something on to transition
+            */
+            var remainderLabel = this.dataGroup
+                .append("svg:text")
+                .attr("text-anchor", "middle")
+                .attr("transform", "translate(0,"+self.height/2+")")
+                .style("font-weight", "bold")
+                .text(this.total + " points remaining");
+
             this.globalTransition(function(){
-                labels.transition()
-                .attrTween("opacity", function(){
-                    var interpolate = d3.interpolate(0, 1);
+                remainderLabel.transition()
+                .tween("text", function(){
+                    var interpolate = d3.interpolate(self.total, self.remainder);
                     return function(t) {
-                        return interpolate(t);
+                        this.textContent = Math.round(interpolate(t)) + " points remaining";
                     };                    
-                })
+                });
             });
 
         },

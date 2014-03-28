@@ -1,12 +1,13 @@
 var app = {};
 
 app.donutChart = (function() {
+    "use strict";
 
     var extend = function(base, incoming){
         for(var prop in incoming){
             base[prop] = incoming[prop];
         }
-    }
+    };
 
     var donutChart = function(params) {
         var defaults = {
@@ -17,7 +18,8 @@ app.donutChart = (function() {
             height: 100,
             origin: 0,
             padding: 0,
-            destination: 360
+            destination: 360,
+            animationComplete: function(){}
         };
 
         extend(defaults, params);
@@ -116,8 +118,12 @@ app.donutChart = (function() {
             }
         },
         globalTransition: function(f) {
+            var self = this;
             d3.transition().delay(500).duration(1000).ease(this.easing)
-                .each(f);
+                .each(f)
+                .each("end", function(){
+                    self.animationComplete.call(self);
+                });
         },
         applyAnimation: function() {
             var self = this;
@@ -172,6 +178,7 @@ app.donutChart = (function() {
                 remainder -= val.n;
                 r.push(item);
             }
+            this.total = data.total;
             this.remainder = remainder;
 
             return r;
