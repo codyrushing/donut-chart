@@ -1,11 +1,20 @@
 module.exports = function(grunt) {
     "use strict";
 
+    console.log(grunt.file.readJSON("package.json"));
+
     // 1. All configuration goes here
     grunt.initConfig({
         pkg: grunt.file.readJSON("package.json"),
         jshint: {
             all: ["Gruntfile.js", "js/*.js"]
+        },
+        uglify: {
+            target: {
+                files: {
+                    "js/<%= pkg.name %>.min.js": ["js/<%= pkg.name %>.js"]
+                }
+            } 
         },
         watch: {
             scripts: {
@@ -17,9 +26,10 @@ module.exports = function(grunt) {
 
     // 3. Where we tell Grunt we plan to use this plug-in.
     grunt.loadNpmTasks("grunt-contrib-jshint");
+    grunt.loadNpmTasks("grunt-contrib-uglify");
     grunt.loadNpmTasks("grunt-contrib-watch");
 
     // 4. Where we tell Grunt what to do when we type "grunt" into the terminal.
-    grunt.registerTask("default", ["jshint", "watch"]);
+    grunt.registerTask("default", ["jshint", "uglify", "watch"]);
 
 };

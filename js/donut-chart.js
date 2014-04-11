@@ -12,14 +12,16 @@ app.donutChart = (function() {
     var donutChart = function(params) {
         var defaults = {
             ascending: true,
-            easing: "quad-in-out",
-            animated: true,
+            ease: "quad-in-out",
+            useTransition: true,
             width: 100,
             height: 100,
             origin: 0,
             padding: 0,
             destination: 360,
-            animationComplete: function(){}
+            transitionDelay: 500,
+            transitionDuration: 1000,
+            transitionComplete: function(){}
         };
 
         extend(defaults, params);
@@ -49,20 +51,16 @@ app.donutChart = (function() {
                     return d.innerRadius || self.width / 2;
                 })
                 .startAngle(function(d, i){
-                    return d.startAngleFinal || self.degreesToRadians(self.origin);
+                    return d.startAngle || self.degreesToRadians(self.origin);
                 })
                 .endAngle(function(d, i) {
-                    return d.endAngleFinal || self.degreesToRadians(self.origin);
+                    return d.endAngle || self.degreesToRadians(self.origin);
                 });
 
-            if(!this.animated){
+            if(!this.useTransition){
                 this.baseArc
-                    .innerRadius(this.width / 2 - this.thickness)
-                    .startAngle(function(d, i){
-                        return d.startAngle || self.degreesToRadians(self.origin);
-                    })
-                    .endAngle(function(d, i) {
-                        return d.endAngle || self.degreesToRadians(self.origin);
+                    .innerRadius(function(d){
+                        return d.innerRadius || self.width / 2 - self.thickness;
                     });
             }
 
@@ -83,8 +81,8 @@ app.donutChart = (function() {
             this.backgroundArc = this.backgroundGroup
                 .append("svg:path")
                 .datum({
-                    startAngleFinal: this.degreesToRadians(this.origin),
-                    endAngleFinal: this.degreesToRadians(this.destination)
+                    startAngle: this.degreesToRadians(this.origin),
+                    endAngle: this.degreesToRadians(this.destination),
                 })
                 .style("fill", this.bgColor || "#ebeff6")
                 .attr("d", this.baseArc);
@@ -108,24 +106,23 @@ app.donutChart = (function() {
                 })
                 .attr("d", this.baseArc);
 
-            // hook
             if (this.buildComplete && typeof this.buildComplete === "function") {
                 this.buildComplete.call(this);
             }
 
-            if (this.animated) {
-                this.applyAnimation();
-            }
+            this.applyTransition();
         },
         globalTransition: function(f) {
             var self = this;
-            d3.transition().delay(500).duration(1000).ease(this.easing)
-                .each(f)
-                .each("end", function(){
-                    self.animationComplete.call(self);
-                });
+            if(this.useTransition){
+                d3.transition().delay(this.transitionDelay).duration(this.transitionDuration).ease(this.ease)
+                    .each(f)
+                    .each("end", function(){
+                        self.transitionComplete.call(self);
+                    });
+            }
         },
-        applyAnimation: function() {
+        applyTransition: function() {
             var self = this;
             this.globalTransition(function() {
 
@@ -137,8 +134,8 @@ app.donutChart = (function() {
                     var iStart = d3.interpolate(originAngle, d.startAngle),
                         iEnd = d3.interpolate(originAngle, d.endAngle);
                     return function(t) {
-                        d.startAngleFinal = iStart(t);
-                        d.endAngleFinal = iEnd(t);
+                        d.startAngle = iStart(t);
+                        d.endAngle = iEnd(t);
                         d.innerRadius = self.width / 2 - radiusInterpolate(t);
                         return self.baseArc(d);
                     };
