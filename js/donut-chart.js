@@ -19,7 +19,10 @@ app.donutChart = (function() {
             origin: 0,
             padding: 0,
             destination: 360,
+            thickness: 10,
             transitionDelay: 500,
+            tweenThickness: true,
+            tweenAngle: true,
             transitionDuration: 1000,
             transitionComplete: function(){}
         };
@@ -127,12 +130,12 @@ app.donutChart = (function() {
             this.globalTransition(function() {
 
                 var originAngle = self.degreesToRadians(self.origin),
-                    radiusInterpolate = d3.interpolate(0, self.thickness);
+                    radiusInterpolate = d3.interpolate(self.tweenThickness ? 0 : self.thickness, self.thickness);
 
                 // progress arc, both endAngle and thickness
                 self.arcs.transition().attrTween("d", function(d) {
-                    var iStart = d3.interpolate(originAngle, d.startAngle),
-                        iEnd = d3.interpolate(originAngle, d.endAngle);
+                    var iStart = d3.interpolate(self.tweenAngle ? originAngle : d.startAngle, d.startAngle),
+                        iEnd = d3.interpolate(self.tweenAngle ? originAngle : d.endAngle, d.endAngle);
                     return function(t) {
                         d.startAngle = iStart(t);
                         d.endAngle = iEnd(t);
