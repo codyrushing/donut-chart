@@ -1,6 +1,5 @@
-var app = {};
 
-app.donutChart = (function() {
+var donutChart = (function() {
     "use strict";
 
     var extend = function(base, incoming){
@@ -9,7 +8,7 @@ app.donutChart = (function() {
         }
     };
 
-    var donutChart = function(params) {
+    var _donutChart = function(params) {
         var defaults = {
             ascending: true,
             ease: "quad-in-out",
@@ -37,7 +36,7 @@ app.donutChart = (function() {
         return this;
     };
 
-    donutChart.prototype = {
+    _donutChart.prototype = {
         build: function() {
             var self = this,
                 remainder = this.remainder;
@@ -117,10 +116,13 @@ app.donutChart = (function() {
         },
         globalTransition: function(f) {
             var self = this;
+
             if(this.useTransition){
-                d3.transition().delay(this.transitionDelay).duration(this.transitionDuration).ease(this.ease)
+                this.chartWrap.transition().delay(this.transitionDelay).duration(this.transitionDuration).ease(this.ease)
                     .each(f)
-                    .each("end", function(){
+                    // this chains another transition to the main transition, but is really just used as a callback
+                    .transition()
+                    .each("start", function(){
                         self.transitionComplete.call(self);
                     });
             }
@@ -186,6 +188,6 @@ app.donutChart = (function() {
 
     };
 
-    return donutChart;
+    return _donutChart;
 
 })();
