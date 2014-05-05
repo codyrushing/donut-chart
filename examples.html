@@ -1,0 +1,562 @@
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF8">
+	<title>Donut Charts</title>
+</head>
+<style type="text/css">
+section { clear: both; padding: 1em 0; }
+section:after {
+    content: ""; display: block; clear: both; visibility: hidden; line-height: 0; height: 0;    
+}
+section h3 { text-align: center; margin-top: 0; }
+section > div { float: left; max-width: 240px; padding: 1em; }
+section > div:nth-child(2n+1) { background: #ccc; }
+
+.slice path {cursor: pointer;}
+</style>
+<body>
+
+
+    <section>
+        <h2>Data</h2>
+        <p>This is designed to be used with progress-style donut charts.  In addition to your array of values, you will need a <code>total</code> key.</p>
+        <pre>
+        var data = {
+            total: 70000, 
+            values: [
+                { n: 40125, color: "#6dab42" }, 
+                { n: 10000, color: "#ff0000" }, 
+                { n: 5000, color: "#0000ff" }, 
+                { n: 5000, color: "#ffff00" }, 
+                { n: 3000, color: "#f92a39" }
+            ]
+        };
+        </pre>
+    </section>
+
+    <section>
+        <h2>Layout</h2>
+        <div id="simple">
+            <h3>Simple example</h3>
+        </div>
+        <div id="simple-larger">
+            <h3>Larger</h3>
+        </div>
+        <div id="simple-thicker">
+            <h3>Thicker</h3>
+        </div>
+        <div id="simple-padding">
+            <h3>Padding</h3>
+        </div>    
+        <div id="simple-partial">
+            <h3>Partial donut</h3>
+        </div>    
+    </section>
+
+    <section>
+        <h2>Transitions</h2>
+        <div id="no-transition">
+            <h3>No transition</h3>
+        </div>
+        <div id="transition-thickness">
+            <h3>Tween thickness only</h3>
+        </div>
+        <div id="transition-angle">
+            <h3>Tween angle only</h3>
+        </div>
+        <div id="transition-callback">
+            <h3>Transition end callback</h3>
+        </div>
+    </section>
+
+    <section>
+        <h2>Labels</h2>
+        <div id="label-global">
+            <h3>Adding a global label in the center</h3>
+        </div>
+
+        <div id="labels">
+            <h3>Adding labels for each value</h3>
+        </div>
+
+        <div id="labels-transition">
+            <h3>Adding labels - fade in after transition completes</h3>
+        </div>
+    </section>
+
+    <section>
+        <h2>Events</h2>
+        <div id="events-labels">
+            <h3>Show labels on hover</h3>
+        </div>
+    </section>
+
+    <section>
+        <h2>Advanced</h2>
+
+        <div id="transition-extend">
+            <h3>Extending transitions the transition to also tween the remainder value</h3>
+        </div>    
+
+    </section>
+
+    <script type="text/javascript" src="js/lib/d3.min.js"></script>
+    <script type="text/javascript" src="js/donut-chart.js"></script>
+    <script type="text/javascript">
+
+    var data = {
+        total: 70000,
+        values: [{
+            n: 40125,
+            color: "#6dab42"
+        }, {
+            n: 10000,
+            color: "#ff0000"
+        }, {
+            n: 5000,
+            color: "#0000ff"
+        }, {
+            n: 5000,
+            color: "#ffff00"
+        }, {
+            n: 3000,
+            color: "#f92a39"
+        }]
+    };
+
+    (function(){
+        // simple example
+        var simpleChart = new donutChart({
+            container: "#simple",
+            data: {
+                total: 70000,
+                values: [{
+                    n: 40125,
+                    color: "#6dab42"
+                }, {
+                    n: 10000,
+                    color: "#ff0000"
+                }, {
+                    n: 5000,
+                    color: "#0000ff"
+                }, {
+                    n: 5000,
+                    color: "#ffff00"
+                }, {
+                    n: 3000,
+                    color: "#f92a39"
+                }]
+            }
+        });
+    })();
+
+    (function(){
+        var simpleChart = new donutChart({
+            container: "#simple-larger",
+            width: 150,
+            height: 150,
+            data: data
+        });
+    })();
+
+    (function(){
+        var simpleChart = new donutChart({
+            container: "#simple-thicker",
+            thickness: 30,
+            data: data
+        });
+    })();
+
+    (function(){
+        var simpleChart = new donutChart({
+            container: "#simple-padding",
+            padding: 50,
+            data: data
+        });
+    })();
+
+    (function(){
+        var simpleChart = new donutChart({
+            container: "#simple-partial",
+            padding: 50,
+            origin: -130,
+            destination: 130,
+            data: data
+        });
+    })();
+
+    (function(){
+        var simpleChart = new donutChart({
+            container: "#no-transition",
+            useTransition: false,
+            data: data
+        });
+    })();    
+
+    (function(){
+        var simpleChart = new donutChart({
+            container: "#transition-thickness",
+            tweenAngle: false,
+            data: data
+        });
+    })();    
+
+    (function(){
+        var simpleChart = new donutChart({
+            container: "#transition-angle",
+            tweenThickness: false,
+            data: data
+        });
+    })();    
+
+    (function(){
+        var simpleChart = new donutChart({
+            container: "#transition-callback",
+            padding: 50,
+            data: data,
+            transitionComplete: function(){
+                this.dataGroup.append("svg:text")
+                    .attr("transform", "translate(0,"+this.height/2+")")
+                    .attr("dy", "1em")
+                    .attr("text-anchor", "middle")
+                    .text("Transition complete!");                
+            }
+        });
+    })();    
+
+    (function(){
+        // labels example
+        var labelsChart = new donutChart({
+            container: "#label-global",
+            data: data,
+            width: 200,
+            height: 200,
+            useTransition: false,
+            buildComplete: function(){
+                var self = this;
+                /* 
+                * add global label
+                */
+                this.dataGroup.append("svg:text")
+                    .attr("dy", ".35em")
+                    .attr("text-anchor", "middle")
+                    .style("font", "bold 36px Arial")
+                    .text("Points");            }
+        });
+    })();
+
+
+    (function(){
+        // labels example
+        var labels;
+
+        var labelsChart = new donutChart({
+            container: "#labels",
+            data: data,
+            padding: 50,
+            useTransition: false,
+            transitionComplete: function(){
+                /*
+                * fade in labels when transition completes
+                */
+                labels.transition().duration(1000).attrTween("opacity", function(){
+                    var interpolate = d3.interpolate(0, 1);
+                    return function(t) {
+                        return interpolate(t);
+                    };                                    
+                });
+            },
+            buildComplete: function(){
+                var self = this;
+
+                /* 
+                * add arc labels
+                */
+                labels = this.slices
+                    .append("svg:text")
+                    .attr("transform", function(d, i) {
+                        // position them outside of the arc
+                        var o = {
+                            startAngle: d.startAngle,
+                            endAngle: d.endAngle,
+                            innerRadius: self.width/2,
+                            outerRadius: self.width/2 + 50
+                        };
+                        return "translate(" + self.baseArc.centroid(o) + ")";
+                    })
+                    .attr("text-anchor", "middle")
+                    .attr("opacity", this.useTransition ? 0 : 1)
+                    .text(function(d){
+                        return d.n;
+                    });
+            }
+        });
+    })();
+
+    (function(){
+        // labels example (w/ transitions)
+        var labels;
+
+        var labelsWithTransition = new donutChart({
+            container: "#labels-transition",
+            data: data,
+            padding: 50,
+            transitionComplete: function(){
+                /*
+                * fade in labels when transition completes
+                */
+                labels.transition().duration(1000).attrTween("opacity", function(){
+                    var interpolate = d3.interpolate(0, 1);
+                    return function(t) {
+                        return interpolate(t);
+                    };                                    
+                });
+            },
+            buildComplete: function(){
+                var self = this;
+
+                /* 
+                * add arc labels
+                */
+                labels = this.slices
+                    .append("svg:text")
+                    .attr("transform", function(d, i) {
+                        // position them outside of the arc
+                        var o = {
+                            startAngle: d.startAngle,
+                            endAngle: d.endAngle,
+                            innerRadius: self.width/2,
+                            outerRadius: self.width/2 + 50
+                        };
+                        return "translate(" + self.baseArc.centroid(o) + ")";
+                    })
+                    .attr("text-anchor", "middle")
+                    .attr("opacity", this.useTransition ? 0 : 1)
+                    .text(function(d){
+                        return d.n;
+                    });
+            }
+        });
+
+    })();
+
+
+    (function(){
+        // labels example (w/ transitions)
+        var labels;
+
+        var labelsWithTransition = new donutChart({
+            container: "#events-labels",
+            data: data,
+            padding: 50,
+            thickness: 20,
+            buildComplete: function(){
+                var self = this;
+
+                /* 
+                * add arc labels
+                */
+                labels = this.slices
+                    .append("svg:text")
+                    .attr("transform", function(d, i) {
+                        // position them outside of the arc
+                        var o = {
+                            startAngle: d.startAngle,
+                            endAngle: d.endAngle,
+                            innerRadius: self.width/2,
+                            outerRadius: self.width/2 + 50
+                        };
+                        return "translate(" + self.baseArc.centroid(o) + ")";
+                    })
+                    .attr("text-anchor", "middle")
+                    .attr("class", "label")
+                    .attr("opacity", 0)                    
+                    .text(function(d){
+                        return d.n;
+                    });
+
+                this.slices
+                    .on("mouseover", function(d, i){
+                        d3.select(this).select(".label")
+                            .transition().duration(200).attrTween("opacity", function(){
+                                var interpolate = d3.interpolate(d3.select(this).attr("opacity"), 1);
+                                return function(t) {
+                                    return interpolate(t);
+                                };                                    
+                            });
+                    })
+                    .on("mouseout", function(d, i){
+                        d3.select(this).select(".label")
+                            .transition().duration(200).attrTween("opacity", function(){
+                                var interpolate = d3.interpolate(d3.select(this).attr("opacity"), 0);
+                                return function(t) {
+                                    return interpolate(t);
+                                };                                    
+                            });
+                    })
+            }
+        });
+
+    })();
+
+
+    (function(){
+        // extending transitions
+        var extendedChart = new donutChart({
+            container: "#transition-extend",
+            data: data,
+            width: 150,
+            height: 150,
+            padding: 20,
+            buildComplete: function(){
+                var self = this;
+
+                /*
+                * tacking something on to transition
+                */
+                var remainderLabel = this.dataGroup
+                    .append("svg:text")
+                    .attr("text-anchor", "middle")
+                    .attr("transform", "translate(0," + self.height/2 + ")")
+                    .attr("dy", "1em")
+                    .style("font-weight", "bold")
+                    .text((this.useTransition ? this.total : this.remainder) + " points remaining");
+
+                this.globalTransition(function(){
+                    remainderLabel.transition()
+                    .tween("text", function(){
+                        var interpolate = d3.interpolate(self.total, self.remainder);
+                        return function(t) {
+                            this.textContent = Math.round(interpolate(t)) + " points remaining";
+                        };                    
+                    });
+                });
+            }
+        });
+
+    })();
+
+
+
+    // (function(){
+    //     // extended example
+    //     var labels;
+
+    //     var exampleChart = new donutChart({
+    //         container: "#container",
+    //         height: 300,
+    //         width: 300,
+    //         label: "Points",
+    //         type: "points",
+    //         origin: -130,
+    //         destination: 130,
+    //         thickness: 25,
+    //         padding: 50,
+    //         useTransition: true,
+    //         remainderLabel: "points needed",
+    //         transitionComplete: function(){
+    //             /*
+    //             * fade in labels when transition completes
+    //             */
+    //             labels.transition().duration(1000).attrTween("opacity", function(){
+    //                 var interpolate = d3.interpolate(0, 1);
+    //                 return function(t) {
+    //                     return interpolate(t);
+    //                 };                                    
+    //             });
+    //         },
+    //         buildComplete: function() {
+    //             var self = this;
+
+    //             /* 
+    //             * add arc labels
+    //             */
+    //             labels = this.slices
+    //                 .append("svg:text")
+    //                 .attr("transform", function(d, i) {
+    //                     var o = {
+    //                         startAngle: d.startAngle,
+    //                         endAngle: d.endAngle,
+    //                         innerRadius: self.width/2,
+    //                         outerRadius: self.width/2 + 50
+    //                     };
+    //                     return "translate(" + self.baseArc.centroid(o) + ")";
+    //                 })
+    //                 .attr("text-anchor", "middle")
+    //                 .attr("opacity", this.useTransition ? 0 : 1)
+    //                 .text(function(d){
+    //                     return d.n;
+    //                 });
+
+    //             /* 
+    //             * add global label
+    //             */
+    //             this.dataGroup.append("svg:text")
+    //                 .attr("dy", ".35em")
+    //                 .attr("text-anchor", "middle")
+    //                 .style("font", "bold 36px Arial")
+    //                 .text(this.label);
+
+    //             /* 
+    //             * events example
+    //             */
+    //             this.arcs
+    //             .on("mouseover", function(d, i){
+    //                 d.outerRadius = self.baseArc.outerRadius()(d) + 5;
+    //                 d.innerRadius = self.baseArc.innerRadius()(d) - 5; 
+    //                 d3.select(this).attr("d", self.baseArc(d));
+    //             })
+    //             .on("mouseout", function(d, i){
+    //                 d.outerRadius -= 5;
+    //                 d.innerRadius += 5;
+    //                 d3.select(this).attr("d", self.baseArc(d));
+    //             });
+
+    //             /*
+    //             * tacking something on to transition
+    //             */
+    //             var remainderLabel = this.dataGroup
+    //                 .append("svg:text")
+    //                 .attr("text-anchor", "middle")
+    //                 .attr("transform", "translate(0,"+self.height/2+")")
+    //                 .style("font-weight", "bold")
+    //                 .text((this.useTransition ? this.total : this.remainder) + " points remaining");
+
+    //             this.globalTransition(function(){
+    //                 remainderLabel.transition()
+    //                 .tween("text", function(){
+    //                     var interpolate = d3.interpolate(self.total, self.remainder);
+    //                     return function(t) {
+    //                         this.textContent = Math.round(interpolate(t)) + " points remaining";
+    //                     };                    
+    //                 });
+    //             });
+
+    //         },
+    //         data: {
+    //             total: 70000,
+    //             values: [{
+    //                 n: 40125,
+    //                 color: "#6dab42"
+    //             }, {
+    //                 n: 10000,
+    //                 color: "#ff0000"
+    //             }, {
+    //                 n: 5000,
+    //                 color: "#0000ff"
+    //             }, {
+    //                 n: 5000,
+    //                 color: "#ffff00"
+    //             }, {
+    //                 n: 3000,
+    //                 color: "#f92a39"
+    //             }]
+    //         }
+    //     });
+    
+    // })();
+
+
+    </script>
+</body>
+</html>

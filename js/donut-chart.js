@@ -10,7 +10,6 @@ var donutChart = (function() {
 
     var _donutChart = function(params) {
         var defaults = {
-            ascending: true,
             ease: "quad-in-out",
             useTransition: true,
             width: 100,
