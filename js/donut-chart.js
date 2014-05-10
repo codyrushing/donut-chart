@@ -162,7 +162,7 @@ var donutChart = (function() {
             var startAngle = this.degreesToRadians(this.origin),
                 endAngle,
                 remainder = data.total,
-                item, lastItem, val,
+                item, lastItem, val, prop,
                 r = [];
 
             for (var i = 0; i < data.values.length; i++) {
@@ -171,14 +171,19 @@ var donutChart = (function() {
                 item = {
                     startAngle: startAngle,
                     endAngle: endAngle,
-                    color: val.color,
                     percent: Math.round(val.n / data.total),
-                    n: val.n
                 };
+                // merge any other data
+                for(prop in val){
+                    if(!item.hasOwnProperty(prop)){
+                        item[prop] = val[prop];
+                    }
+                }
                 startAngle = endAngle;
                 remainder -= val.n;
                 r.push(item);
             }
+
             this.total = data.total;
             this.remainder = remainder;
 
